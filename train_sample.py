@@ -51,7 +51,7 @@ model = Seq2Seq(enc, dec).cuda()
 crit = nn.CrossEntropyLoss(ignore_index=ds.PAD_IDX)
 opt = optim.Adam(model.parameters())
 
-epoch = 5
+epoch = 10
 e_plot = np.zeros((epoch, 1))
 
 for e in range(epoch):
