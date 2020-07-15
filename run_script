@@ -1,1 +1,3 @@
+#!/bin/bash
+
 MMF_USER_DIR="." mmf_run model=simple_baseline dataset=gqa
