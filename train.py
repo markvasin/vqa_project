@@ -7,7 +7,7 @@ from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader, random_split
 from tqdm.autonotebook import tqdm
 
-from sample import CodeDataset
+from sample.CodeDataset import CodeDataset
 from sample.seq2seq import Seq2Seq, Decoder, Encoder
 
 torch.manual_seed(0)
