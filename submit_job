@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# mail alert at start, end and abortion of execution
+#SBATCH --mail-type=ALL
+
+# send mail to this address
+#SBATCH --mail-user=vs2n19@soton.ac.uk
+
+cd $HOME/vqa-project
+
+module load conda
+source deactivate
+source activate /scratch/vs2n19/.conda/envs/deep-vqa
+python train_sample.py
