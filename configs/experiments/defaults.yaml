@@ -10,7 +10,7 @@ evaluation:
   - accuracy
 
 training:
-  batch_size: 128
+  batch_size: 64
   snapshot_interval: 6000
   early_stop:
     criteria: clevr/accuracy
