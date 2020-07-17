@@ -1,5 +1,5 @@
 model_config:
-  cnn_lstm:
+  simple_baseline:
     losses:
     - type: logit_bce
     text_embedding:
