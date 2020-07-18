@@ -1,3 +1,13 @@
 #!/bin/bash
 
+
+#training
 MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" model=simple_baseline dataset=clevr
+
+#evaluating
+MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" \
+    model=simple_baseline \
+    dataset=clevr \
+    run_type=val \
+    checkpoint.resume=True \
+    checkpoint.resume_best=True

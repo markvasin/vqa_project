@@ -7,6 +7,9 @@ from mmf.common.registry import registry
 from mmf.models.base_model import BaseModel
 from mmf.modules.layers import ClassifierLayer, ConvNet, Flatten
 
+# Builder methods for image encoder
+from mmf.utils.build import build_image_encoder
+
 _TEMPLATES = {
     "question_vocab_size": "{}_text_vocab_size",
     "number_of_answers": "{}_num_final_outputs",
@@ -53,18 +56,7 @@ class SimpleBaseline(BaseModel):
         )
         self.lstm = nn.LSTM(**self.config.lstm)
 
-        layers_config = self.config.cnn.layers
-        conv_layers = []
-        for i in range(len(layers_config.input_dims)):
-            conv_layers.append(
-                ConvNet(
-                    layers_config.input_dims[i],
-                    layers_config.output_dims[i],
-                    kernel_size=layers_config.kernel_sizes[i],
-                )
-            )
-        conv_layers.append(Flatten())
-        self.cnn = nn.Sequential(*conv_layers)
+        self.vision_module = build_image_encoder(self.config.image_encoder)
 
         # As we generate output dim dynamically, we need to copy the config
         # to update it
@@ -89,10 +81,13 @@ class SimpleBaseline(BaseModel):
         assert hidden.size(1) == 2, _CONSTANTS["hidden_state_warning"]
 
         hidden = torch.cat([hidden[:, 0, :], hidden[:, 1, :]], dim=-1)
-        image = self.cnn(image)
+
+        image_features = self.vision_module(image)
+        # Flatten the embeddings before concatenation
+        image_features = torch.flatten(image_features, start_dim=1)
 
         # Fuse into single dimension
-        fused = torch.cat([hidden, image], dim=-1)
+        fused = torch.cat([hidden, image_features], dim=-1)
         scores = self.classifier(fused)
 
         return {"scores": scores}
