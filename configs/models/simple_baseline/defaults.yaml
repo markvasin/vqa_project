@@ -1,5 +1,6 @@
 model_config:
   simple_baseline:
+    freeze_visual: true
     losses:
     - type: logit_bce
     text_embedding:
@@ -18,5 +19,5 @@ model_config:
     classifier:
       type: mlp
       params:
-        in_dim: 450
+        in_dim: 3072
         out_dim: 2

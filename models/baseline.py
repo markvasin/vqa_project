@@ -1,14 +1,12 @@
 from copy import deepcopy
 
 import torch
-from torch import nn
-
 from mmf.common.registry import registry
 from mmf.models.base_model import BaseModel
-from mmf.modules.layers import ClassifierLayer, ConvNet, Flatten
-
+from mmf.modules.layers import ClassifierLayer
 # Builder methods for image encoder
 from mmf.utils.build import build_image_encoder
+from torch import nn
 
 _TEMPLATES = {
     "question_vocab_size": "{}_text_vocab_size",
@@ -57,6 +55,10 @@ class SimpleBaseline(BaseModel):
         self.lstm = nn.LSTM(**self.config.lstm)
 
         self.vision_module = build_image_encoder(self.config.image_encoder)
+
+        if self.config.freeze_visual:
+            for p in self.vision_module.parameters():
+                p.requires_grad = False
 
         # As we generate output dim dynamically, we need to copy the config
         # to update it
