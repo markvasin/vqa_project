@@ -1,9 +1,8 @@
 optimizer:
-  type: Adamax
+  type: adam_w
   params:
-    eps: 1.0e-08
-    lr: 0.01
-    weight_decay: 0
+    lr: 5e-5
+    eps: 1e-8
 
 evaluation:
   metrics:

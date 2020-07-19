@@ -2,7 +2,12 @@
 
 
 #training
-MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" model=simple_baseline dataset=clevr training.batch_size=32
+MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" model=simple_baseline dataset=clevr run_type=train_val training.batch_size=128
+
+#resume training
+MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" model=simple_baseline dataset=clevr \
+ run_type=train_val training.batch_size=128 checkpoint.resume=True
+
 
 #evaluating
 MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" \
@@ -11,3 +16,4 @@ MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" \
     run_type=val \
     checkpoint.resume=True \
     checkpoint.resume_best=True
+
