@@ -8,7 +8,7 @@ from mmf.modules.layers import ClassifierLayer
 from mmf.utils.build import build_image_encoder
 from torch import nn
 
-from models.attention import StackedAttention
+from .attention import StackedAttention
 
 _TEMPLATES = {
     "question_vocab_size": "{}_text_vocab_size",
