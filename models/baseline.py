@@ -8,6 +8,8 @@ from mmf.modules.layers import ClassifierLayer
 from mmf.utils.build import build_image_encoder
 from torch import nn
 
+from models.attention import StackedAttention
+
 _TEMPLATES = {
     "question_vocab_size": "{}_text_vocab_size",
     "number_of_answers": "{}_num_final_outputs",
@@ -60,6 +62,16 @@ class SimpleBaseline(BaseModel):
             for p in self.vision_module.parameters():
                 p.requires_grad = False
 
+        num_stacked_attn = 2
+        stacked_attn_dim = 512
+        rnn_dim = 512
+        self.stacked_attns = []
+        for i in range(num_stacked_attn):
+            sa = StackedAttention(rnn_dim, stacked_attn_dim)
+            self.stacked_attns.append(sa)
+            self.add_module('stacked-attn-%d' % i, sa)
+
+
         # As we generate output dim dynamically, we need to copy the config
         # to update it
         classifier_config = deepcopy(self.config.classifier)
@@ -89,7 +101,11 @@ class SimpleBaseline(BaseModel):
         image_features = torch.flatten(image_features, start_dim=1)
 
         # Fuse into single dimension
-        fused = torch.cat([hidden, image_features], dim=-1)
-        scores = self.classifier(fused)
+        # fused = torch.cat([hidden, image_features], dim=-1)
+        u = hidden
+        for sa in self.stacked_attns:
+            u = sa(image_features, u)
+
+        scores = self.classifier(u)
 
         return {"scores": scores}
