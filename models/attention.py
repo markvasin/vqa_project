@@ -1,4 +1,5 @@
 import torch.nn as nn
+import torch
 import torch.nn.functional as F
 
 
@@ -14,8 +15,8 @@ class StackedAttention(nn.Module):
     def forward(self, v, u):
         """
         Input:
-        - v: N x D x H x W
-        - u: N x D
+        - v: image features N x D x H x W
+        - u: text feature N x D
 
         Returns:
         - next_u: N x D
@@ -25,10 +26,10 @@ class StackedAttention(nn.Module):
         v_proj = self.Wv(v)  # N x K x H x W
         u_proj = self.Wu(u)  # N x K
         u_proj_expand = u_proj.view(N, K, 1, 1).expand(N, K, H, W)
-        h = F.tanh(v_proj + u_proj_expand)
+        h = torch.tanh(v_proj + u_proj_expand)
         p = F.softmax(self.Wp(h).view(N, H * W)).view(N, 1, H, W)
         self.attention_maps = p.data.clone()
 
-        v_tilde = (p.expand_as(v) * v).sum(2).sum(3).view(N, D)
+        v_tilde = (p.expand_as(v) * v).sum(3).sum(2).view(N, D)
         next_u = u + v_tilde
         return next_u

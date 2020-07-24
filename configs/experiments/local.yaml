@@ -15,8 +15,13 @@ training:
     criteria: clevr/accuracy
     minimize: false
 
+env:
+  user_dir: /Users/mark/Projects/vqa_project
+
 dataset_config:
   clevr:
+    data_dir: /Users/mark/Projects/nscl_reproducability_challenge/data
+    data_folder: .
     processors:
       image_processor:
         type: torchvision_transforms
