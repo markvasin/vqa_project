@@ -94,7 +94,7 @@ class SimpleBaseline(BaseModel):
         hidden = torch.cat([hidden[:, 0, :], hidden[:, 1, :]], dim=-1)
 
         image_features = self.vision_module(image)
-        self.writer.write('Image shape: ' + str(image.shape) + ', ' + str(image_features.shape))
+        # self.writer.write('Image shape: ' + str(image.shape) + ', ' + str(image_features.shape))
 
         # Fuse into single dimension
         # fused = torch.cat([hidden, image_features], dim=-1)
