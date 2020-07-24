@@ -73,7 +73,6 @@ class SimpleBaseline(BaseModel):
             self.stacked_attns.append(sa)
             self.add_module('stacked-attn-%d' % i, sa)
 
-
         # As we generate output dim dynamically, we need to copy the config
         # to update it
         classifier_config = deepcopy(self.config.classifier)
@@ -95,6 +94,7 @@ class SimpleBaseline(BaseModel):
         hidden = torch.cat([hidden[:, 0, :], hidden[:, 1, :]], dim=-1)
 
         image_features = self.vision_module(image)
+        self.writer.write('Image shape: ', image.shape, image_features.shape)
 
         # Fuse into single dimension
         # fused = torch.cat([hidden, image_features], dim=-1)
