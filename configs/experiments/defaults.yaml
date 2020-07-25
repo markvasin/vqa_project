@@ -3,7 +3,7 @@ project_name: vqa_project
 optimizer:
   type: adam_w
   params:
-    lr: 5e-5
+    lr: 5e-4
     eps: 1e-8
 
 evaluation:
@@ -12,8 +12,8 @@ evaluation:
 
 training:
   experiment_name: run
-  max_updates: 40000
-  batch_size: 64
+  max_updates: 100000
+  batch_size: 256
   snapshot_interval: 6000
   early_stop:
     criteria: clevr/accuracy
