@@ -1,8 +1,6 @@
-#!/bin/bash
-
 
 #training
-MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" model=simple_baseline dataset=clevr run_type=train_val training.batch_size=128 checkpoint.resume_file=/home/mark/vqa_project/save/best.ckpt training.experiment_name=baseline_att
+MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" model=simple_baseline dataset=clevr run_type=train_val training.batch_size=128 checkpoint.resume=True training.experiment_name=baseline_att
 
 #local
 mmf_run config="configs/experiments/local.yaml" model=simple_baseline dataset=clevr run_type=train_val training.batch_size=128 training.experiment_name=test_run_2
@@ -22,4 +20,5 @@ MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" \
 
 #tensorboard
 tensorboard --logdir=save/logs
+tensorboard --logdir=save/baseline_att/logs/ --bind_all
 

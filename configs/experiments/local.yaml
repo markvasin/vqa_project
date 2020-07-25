@@ -1,3 +1,5 @@
+project_name: vqa_project_local
+
 optimizer:
   type: adam_w
   params:
@@ -16,6 +18,7 @@ training:
     criteria: clevr/accuracy
     minimize: false
   tensorboard: true
+  wandb: true
 
 env:
   user_dir: /Users/mark/Projects/vqa_project

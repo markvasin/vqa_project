@@ -1,3 +1,5 @@
+project_name: vqa_project
+
 optimizer:
   type: adam_w
   params:
@@ -17,6 +19,7 @@ training:
     criteria: clevr/accuracy
     minimize: false
   tensorboard: true
+  wandb: true
 
 env:
   save_dir: ./save/${training.experiment_name}
