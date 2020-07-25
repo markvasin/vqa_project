@@ -14,6 +14,7 @@ training:
   early_stop:
     criteria: clevr/accuracy
     minimize: false
+  tensorboard: true
 
 env:
   user_dir: /Users/mark/Projects/vqa_project

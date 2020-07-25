@@ -20,3 +20,6 @@ MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" \
     checkpoint.resume=True \
     checkpoint.resume_best=True
 
+#tensorboard
+tensorboard --logdir=save/logs
+
