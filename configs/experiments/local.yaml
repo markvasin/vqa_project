@@ -9,6 +9,7 @@ evaluation:
   - accuracy
 
 training:
+  experiment_name: run
   batch_size: 64
   snapshot_interval: 6000
   early_stop:
@@ -18,6 +19,7 @@ training:
 
 env:
   user_dir: /Users/mark/Projects/vqa_project
+  save_dir: ./save/${training.experiment_name}
 
 dataset_config:
   clevr:

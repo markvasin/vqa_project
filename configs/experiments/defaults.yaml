@@ -9,12 +9,16 @@ evaluation:
   - accuracy
 
 training:
+  experiment_name: run
   batch_size: 64
   snapshot_interval: 6000
   early_stop:
     criteria: clevr/accuracy
     minimize: false
   tensorboard: true
+
+env:
+  save_dir: ./save/${training.experiment_name}
 
 dataset_config:
   clevr:
