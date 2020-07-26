@@ -4,8 +4,6 @@ import torch
 from mmf.common.registry import registry
 from mmf.models.base_model import BaseModel
 from mmf.modules.layers import ClassifierLayer
-# Builder methods for image encoder
-from mmf.utils.build import build_image_encoder
 from torch import nn
 
 from .attention import StackedAttention
@@ -21,14 +19,12 @@ _CONSTANTS = {"hidden_state_warning": "hidden state (final) should have 1st dim 
 
 @registry.register_model("simple_baseline")
 class SimpleBaseline(BaseModel):
-    """CNNLSTM is a simple model for vision and language tasks. CNNLSTM is supposed
-    to acts as a baseline to test out your stuff without any complex functionality.
-    Passes image through a CNN, and text through an LSTM and fuses them using
-    concatenation. Then, it finally passes the fused representation from a MLP to
-    generate scores for each of the possible answers.
+    """CNNLSTM + Stack Spatial Attention: A baseline model for VQA task
+    Image encoder is a pretrained resnet-101
+    Text encoder is a bi-directional LSTM
     Args:
         config (DictConfig): Configuration node containing all of the necessary
-                             config required to initialize CNNLSTM.
+                             config required to initialize the model.
     Inputs: sample_list (SampleList)
         - **sample_list** should contain image attribute for image, text for
           question split into word indices, targets for answer scores
