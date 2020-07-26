@@ -8,6 +8,9 @@ mmf_run config="configs/experiments/local.yaml" model=simple_baseline dataset=cl
 #local mac_network
 mmf_run config="configs/experiments/local.yaml" model=mac_network dataset=clevr run_type=train_val training.experiment_name=test_mac
 
+#train MAC
+MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" model=mac_network dataset=clevr run_type=train_val training.experiment_name=mac_run
+
 
 #resume training
 MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" model=simple_baseline dataset=clevr run_type=train_val checkpoint.resume=True training.experiment_name=baseline_att
