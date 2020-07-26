@@ -1,6 +1,7 @@
 model_config:
-  simple_baseline:
+  mac_network:
     freeze_visual: true
+    dimension: 512
     losses:
     - type: cross_entropy
     text_embedding:
@@ -10,6 +11,11 @@ model_config:
       hidden_size: 512
       bidirectional: true
       batch_first: true
+    mac_unit:
+      max_step: 4
+      self_attention: False
+      memory_gate: False
+      dim: 512
     image_encoder:
       type: resnet101
       params:
@@ -17,5 +23,6 @@ model_config:
     classifier:
       type: mlp
       params:
-        in_dim: 1024
+        in_dim: 1536
         out_dim: 2
+        num_layers: 1

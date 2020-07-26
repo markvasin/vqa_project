@@ -11,6 +11,7 @@ evaluation:
 
 training:
   experiment_name: run
+  max_epochs: 10
   max_updates: 100000
   batch_size: 128
   snapshot_interval: 6000
