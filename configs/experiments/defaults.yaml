@@ -12,7 +12,7 @@ evaluation:
 training:
   experiment_name: run
   max_updates: 100000
-  batch_size: 256
+  batch_size: 128
   snapshot_interval: 6000
   early_stop:
     criteria: clevr/accuracy
