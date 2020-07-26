@@ -1,12 +1,12 @@
-#!/bin/bash
-
 
 #training
-MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" model=simple_baseline dataset=clevr run_type=train_val training.batch_size=128
+MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" model=simple_baseline dataset=clevr run_type=train_val checkpoint.resume=True training.experiment_name=baseline_att
+
+#local
+mmf_run config="configs/experiments/local.yaml" model=simple_baseline dataset=clevr run_type=train_val training.batch_size=128 training.experiment_name=test_run_2
 
 #resume training
-MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" model=simple_baseline dataset=clevr \
- run_type=train_val training.batch_size=128 checkpoint.resume=True
+MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" model=simple_baseline dataset=clevr run_type=train_val checkpoint.resume=True training.experiment_name=baseline_att
 
 
 #evaluating
@@ -16,4 +16,8 @@ MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" \
     run_type=val \
     checkpoint.resume=True \
     checkpoint.resume_best=True
+
+#tensorboard
+tensorboard --logdir=save/logs
+tensorboard --logdir=save/baseline_att/logs/ --bind_all
 

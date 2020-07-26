@@ -11,13 +11,11 @@ model_config:
       bidirectional: true
       batch_first: true
     image_encoder:
-      type: resnet152
+      type: resnet101
       params:
         pretrained: true
-        pool_type: avg
-        num_output_features: 1
     classifier:
       type: mlp
       params:
-        in_dim: 3072
+        in_dim: 1024
         out_dim: 2

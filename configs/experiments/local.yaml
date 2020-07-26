@@ -1,4 +1,4 @@
-project_name: vqa_project
+project_name: vqa_project_local
 
 optimizer:
   type: Adam
@@ -11,8 +11,7 @@ evaluation:
 
 training:
   experiment_name: run
-  max_updates: 100000
-  batch_size: 128
+  batch_size: 64
   snapshot_interval: 6000
   early_stop:
     criteria: clevr/accuracy
@@ -21,10 +20,13 @@ training:
   wandb: true
 
 env:
+  user_dir: /Users/mark/Projects/vqa_project
   save_dir: ./save/${training.experiment_name}
 
 dataset_config:
   clevr:
+    data_dir: /Users/mark/Projects/nscl_reproducability_challenge/data
+    data_folder: .
     processors:
       image_processor:
         type: torchvision_transforms
