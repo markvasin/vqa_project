@@ -3,7 +3,7 @@ model_config:
     freeze_visual: true
     dimension: 512
     losses:
-    - type: cross_entropy
+    - type: logit_bce
     text_embedding:
       embedding_dim: 300
     lstm:
