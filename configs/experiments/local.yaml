@@ -10,14 +10,14 @@ evaluation:
   - accuracy
 
 training:
-  experiment_name: run
-  batch_size: 64
+  experiment_name: test_local
+  batch_size: 8
   snapshot_interval: 6000
   early_stop:
     criteria: clevr/accuracy
     minimize: false
-  tensorboard: true
-  wandb: true
+  tensorboard: false
+  wandb: false
 
 env:
   user_dir: /Users/mark/Projects/vqa_project

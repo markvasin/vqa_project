@@ -1,1 +1,2 @@
 import vqa_project.models.baseline
+import vqa_project.models.mac_network
