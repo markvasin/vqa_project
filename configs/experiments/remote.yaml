@@ -40,3 +40,26 @@ dataset_config:
               params:
                 mean: [0.485, 0.456, 0.406]
                 std: [0.229, 0.224, 0.225]
+
+
+model_config:
+  simple_baseline_gqa:
+    freeze_visual: true
+    losses:
+    - type: logit_bce
+    text_embedding:
+      embedding_dim: 300
+    lstm:
+      input_size: 300
+      hidden_size: 512
+      bidirectional: true
+      batch_first: true
+    image_encoder:
+      type: resnet101
+      params:
+        pretrained: true
+    classifier:
+      type: mlp
+      params:
+        in_dim: 1024
+        out_dim: 2
