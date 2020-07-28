@@ -1,8 +1,11 @@
+import os
+
 import h5py
 import json
 import torch
 from mmf.common.sample import Sample
 from mmf.datasets.mmf_dataset import MMFDataset
+from mmf.utils.configuration import get_mmf_env
 
 img = None
 img_info = {}
@@ -12,10 +15,10 @@ def gqa_feature_loader():
     global img, img_info
     if img is not None:
         return img, img_info
-
-    h = h5py.File('data/gqa_features.hdf5', 'r')
+    path = os.path.join(get_mmf_env("data_dir"), "datasets", "gqa", "default", "features")
+    h = h5py.File(f'{path}/gqa_features.hdf5', 'r')
     img = h['features']
-    img_info = json.load(open('data/gqa_objects_merged_info.json', 'r'))
+    img_info = json.load(open(f'{path}/gqa_objects_merged_info.json', 'r'))
     return img, img_info
 
 
