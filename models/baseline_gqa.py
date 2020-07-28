@@ -52,10 +52,6 @@ class SimpleBaseline(BaseModel):
         )
         self.lstm = nn.LSTM(**self.config.lstm)
 
-        if self.config.freeze_visual:
-            for p in self.vision_module.parameters():
-                p.requires_grad = False
-
         num_stacked_attn = 2
         stacked_attn_dim = 512
         rnn_dim = 1024
