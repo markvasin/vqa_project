@@ -73,7 +73,7 @@ class SimpleBaseline(BaseModel):
         self.lstm.flatten_parameters()
 
         question = sample_list.text
-        image_features = sample_list.image
+        image_features = sample_list.image_feature_0
 
         # Get (h_n, c_n), last hidden and cell state
         _, (hidden, cell) = self.lstm(self.text_embedding(question))
