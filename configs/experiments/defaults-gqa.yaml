@@ -3,7 +3,7 @@ project_name: gqa_project
 optimizer:
   type: Adam
   params:
-    lr: 5e-4
+    lr: 3e-4
 
 evaluation:
   metrics:
