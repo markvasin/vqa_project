@@ -1,3 +1,5 @@
+includes:
+  - /home/mark/vqa_project/configs/datasets/gqa2/defaults.yaml
 project_name: vqa_project_remote
 
 optimizer:
@@ -13,9 +15,6 @@ training:
   experiment_name: test_local
   batch_size: 8
   snapshot_interval: 6000
-  early_stop:
-    criteria: clevr/accuracy
-    minimize: false
   tensorboard: false
   wandb: false
 
@@ -44,22 +43,17 @@ dataset_config:
 
 model_config:
   simple_baseline_gqa:
-    freeze_visual: true
     losses:
-    - type: logit_bce
+      - type: logit_bce
     text_embedding:
       embedding_dim: 300
     lstm:
       input_size: 300
-      hidden_size: 512
+      hidden_size: 1024
       bidirectional: true
       batch_first: true
-    image_encoder:
-      type: resnet101
-      params:
-        pretrained: true
     classifier:
       type: mlp
       params:
-        in_dim: 1024
+        in_dim: 2048
         out_dim: 2

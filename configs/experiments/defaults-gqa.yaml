@@ -1,3 +1,6 @@
+includes:
+  - /home/mark/vqa_project/configs/datasets/gqa2/defaults.yaml
+
 project_name: gqa_project
 
 optimizer:
@@ -20,3 +23,20 @@ training:
 
 env:
   save_dir: ./save/${training.experiment_name}
+
+model_config:
+  simple_baseline_gqa:
+    losses:
+      - type: logit_bce
+    text_embedding:
+      embedding_dim: 300
+    lstm:
+      input_size: 300
+      hidden_size: 1024
+      bidirectional: true
+      batch_first: true
+    classifier:
+      type: mlp
+      params:
+        in_dim: 2048
+        out_dim: 2

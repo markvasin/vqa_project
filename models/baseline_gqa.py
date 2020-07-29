@@ -1,11 +1,11 @@
 from copy import deepcopy
 
 import torch
-from torch import nn
-
 from mmf.common.registry import registry
 from mmf.models.base_model import BaseModel
 from mmf.modules.layers import ClassifierLayer
+from torch import nn
+
 from .attention import StackedAttention
 
 _TEMPLATES = {
@@ -47,14 +47,16 @@ class SimpleBaseline(BaseModel):
             _TEMPLATES["number_of_answers"].format(self._datasets[0])
         )
 
-        self.text_embedding = nn.Embedding(
-            num_question_choices, self.config.text_embedding.embedding_dim
-        )
+        text_processor = registry.get(self._datasets[0] + "_text_processor")
+        vocab = text_processor.vocab
+        self.word_embedding = vocab.get_embedding(torch.nn.Embedding,
+                                                  embedding_dim=self.config.text_embedding.embedding_dim)
+
         self.lstm = nn.LSTM(**self.config.lstm)
 
         num_stacked_attn = 2
         stacked_attn_dim = 512
-        rnn_dim = 1024
+        rnn_dim = 2048
         self.stacked_attns = []
         for i in range(num_stacked_attn):
             sa = StackedAttention(rnn_dim, stacked_attn_dim)
@@ -73,10 +75,10 @@ class SimpleBaseline(BaseModel):
         self.lstm.flatten_parameters()
 
         question = sample_list.text
-        image_features = sample_list.image_feature_0
+        image_features = sample_list.img_feature
 
         # Get (h_n, c_n), last hidden and cell state
-        _, (hidden, cell) = self.lstm(self.text_embedding(question))
+        _, (hidden, cell) = self.lstm(self.word_embedding(question))
         # X x B x H => B x X x H where X = num_layers * num_directions
         hidden = hidden.transpose(0, 1)
         hidden = torch.cat([hidden[:, 0, :], hidden[:, 1, :]], dim=-1)

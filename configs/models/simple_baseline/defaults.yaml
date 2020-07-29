@@ -21,20 +21,15 @@ model_config:
         out_dim: 2
 
   simple_baseline_gqa:
-    freeze_visual: true
     losses:
     - type: logit_bce
     text_embedding:
       embedding_dim: 300
     lstm:
       input_size: 300
-      hidden_size: 512
+      hidden_size: 1024
       bidirectional: true
       batch_first: true
-    image_encoder:
-      type: resnet101
-      params:
-        pretrained: true
     classifier:
       type: mlp
       params:

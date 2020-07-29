@@ -6,7 +6,7 @@ from .gqa_dataset import GQADatasetV2
 
 @registry.register_builder("gqa2")
 class GQABuilderV2(MMFDatasetBuilder):
-    def __init__(self, dataset_name="gqa", dataset_class=GQADatasetV2, *args, **kwargs):
+    def __init__(self, dataset_name="gqa2", dataset_class=GQADatasetV2, *args, **kwargs):
         super().__init__(dataset_name, dataset_class)
         self.dataset_class = GQADatasetV2
 

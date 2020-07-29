@@ -15,10 +15,10 @@ def gqa_feature_loader():
     global img, img_info
     if img is not None:
         return img, img_info
-    path = os.path.join(get_mmf_env("data_dir"), "datasets", "gqa", "default", "features")
-    h = h5py.File(f'{path}/gqa_features.hdf5', 'r')
+    path = os.path.join(get_mmf_env("data_dir"), "datasets", "gqa", "defaults", "features")
+    h = h5py.File(f'{path}/gqa_spatial.hdf5', 'r')
     img = h['features']
-    img_info = json.load(open(f'{path}/gqa_objects_merged_info.json', 'r'))
+    img_info = json.load(open(f'{path}/gqa_spatial_merged_info.json', 'r'))
     return img, img_info
 
 
@@ -52,7 +52,7 @@ class GQADatasetV2(MMFDataset):
             current_sample.image_id = sample_info["image_id"]
 
         if self._use_features is True:
-            idx = int(self.img_info[sample_info["image_id"]]['index'])
+            idx = int(self.img_info[str(sample_info["image_id"])]['index'])
             current_sample.img_feature = torch.from_numpy(self.img[idx])
 
 
