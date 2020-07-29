@@ -11,6 +11,6 @@ class ResNet101ImageEncoder(nn.Module):
         self.model = nn.Sequential(*modules)
 
     def forward(self, x):
-        # Bx3x224x224 -> Bx2048x7x7
+        # Bx3x224x224 -> Bx1024x14x14
         out = self.model(x)
         return out

@@ -19,3 +19,19 @@ model_config:
       params:
         in_dim: 1024
         out_dim: 2
+
+  simple_baseline_gqa:
+    losses:
+    - type: logit_bce
+    text_embedding:
+      embedding_dim: 300
+    lstm:
+      input_size: 300
+      hidden_size: 1024
+      bidirectional: true
+      batch_first: true
+    classifier:
+      type: mlp
+      params:
+        in_dim: 1024
+        out_dim: 2

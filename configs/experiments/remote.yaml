@@ -1,0 +1,59 @@
+includes:
+  - /home/mark/vqa_project/configs/datasets/gqa2/defaults.yaml
+project_name: vqa_project_remote
+
+optimizer:
+  type: Adam
+  params:
+    lr: 5e-4
+
+evaluation:
+  metrics:
+  - accuracy
+
+training:
+  experiment_name: test_local
+  batch_size: 8
+  snapshot_interval: 6000
+  tensorboard: false
+  wandb: false
+
+env:
+  user_dir: /home/mark/vqa_project
+  save_dir: ./save/${training.experiment_name}
+
+dataset_config:
+  clevr:
+    data_dir: /Users/mark/Projects/nscl_reproducability_challenge/data
+    data_folder: .
+    processors:
+      image_processor:
+        type: torchvision_transforms
+        params:
+          transforms:
+            - type: Resize
+              params:
+                size: [224, 224]
+            - ToTensor
+            - type: Normalize
+              params:
+                mean: [0.485, 0.456, 0.406]
+                std: [0.229, 0.224, 0.225]
+
+
+model_config:
+  simple_baseline_gqa:
+    losses:
+      - type: logit_bce
+    text_embedding:
+      embedding_dim: 300
+    lstm:
+      input_size: 300
+      hidden_size: 1024
+      bidirectional: true
+      batch_first: true
+    classifier:
+      type: mlp
+      params:
+        in_dim: 2048
+        out_dim: 2

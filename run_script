@@ -11,6 +11,9 @@ mmf_run config="configs/experiments/local.yaml" model=mac_network dataset=clevr 
 #train MAC
 MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" model=mac_network dataset=clevr run_type=train_val training.experiment_name=mac_run
 
+#train GQA dataset
+MMF_USER_DIR="." mmf_run config="configs/experiments/defaults-gqa.yaml" model=simple_baseline_gqa dataset=gqa2 run_type=train_val training.experiment_name=test_gqa checkpoint.resume=True
+
 
 #resume training
 MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" model=simple_baseline dataset=clevr run_type=train_val checkpoint.resume=True training.experiment_name=baseline_att
@@ -23,6 +26,11 @@ MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" \
     run_type=val \
     checkpoint.resume=True \
     checkpoint.resume_best=True
+
+#Prediction
+MMF_USER_DIR="." mmf_predict config="configs/experiments/defaults-gqa.yaml" model=simple_baseline_gqa dataset=gqa2 run_type=test training.experiment_name=test_gqa checkpoint.resume=True
+
+
 
 #tensorboard
 tensorboard --logdir=save/logs
