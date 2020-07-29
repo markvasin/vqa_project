@@ -37,6 +37,7 @@ class GQADatasetV2(MMFDataset):
         text_processor_argument = {"text": sample_info["question_str"]}
         processed_question = self.text_processor(text_processor_argument)
         current_sample.text = processed_question["text"]
+        current_sample.raw_question = sample_info["question_str"]
         if "input_ids" in processed_question:
             current_sample.update(processed_question)
 
@@ -88,7 +89,7 @@ class GQADatasetV2(MMFDataset):
                 answer = self.answer_processor.idx2word(answer_id)
 
             predictions.append(
-                {"questionId": question_id.item(), "prediction": answer, }
+                {"questionId": question_id.item(), "prediction": answer, "question": report.raw_question[idx]}
             )
 
         return predictions
