@@ -34,6 +34,10 @@ MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" \
 MMF_USER_DIR="." mmf_predict config="configs/experiments/defaults-gqa.yaml" model=simple_baseline_gqa dataset=gqa2 run_type=test training.experiment_name=test_gqa checkpoint.resume=True
 
 
+#finetune VisualBERT on GQA dataset
+MMF_USER_DIR="." mmf_run config="configs/experiments/visual-bert-gqa.yaml" run_type=train_val dataset=gqa model=visual_bert
+
+
 
 #tensorboard
 tensorboard --logdir=save/logs
