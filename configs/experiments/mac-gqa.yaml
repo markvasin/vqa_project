@@ -23,3 +23,6 @@ training:
 
 env:
   save_dir: ./save/${training.experiment_name}
+
+checkpoint:
+  max_to_keep: 10
