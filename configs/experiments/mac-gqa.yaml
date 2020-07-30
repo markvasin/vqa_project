@@ -1,0 +1,28 @@
+includes:
+  - /home/mark/vqa_project/configs/datasets/gqa2/defaults.yaml
+
+project_name: gqa_project
+
+optimizer:
+  type: Adam
+  params:
+    lr: 1e-4
+
+evaluation:
+  metrics:
+  - accuracy
+
+training:
+  experiment_name: mac_gqa
+  max_epochs: 15
+  max_updates: 100000
+  batch_size: 128
+  snapshot_interval: 10000
+  tensorboard: true
+  wandb: true
+
+env:
+  save_dir: ./save/${training.experiment_name}
+
+checkpoint:
+  max_to_keep: 10

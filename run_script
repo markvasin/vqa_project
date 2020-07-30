@@ -14,6 +14,9 @@ MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" model=mac_ne
 #train GQA dataset
 MMF_USER_DIR="." mmf_run config="configs/experiments/defaults-gqa.yaml" model=simple_baseline_gqa dataset=gqa2 run_type=train_val training.experiment_name=test_gqa checkpoint.resume=True
 
+#train MAC_network on GQA
+MMF_USER_DIR="." mmf_run config="configs/experiments/mac-gqa.yaml" model=mac_network dataset=gqa2 run_type=train_val training.experiment_name=mac_gqa checkpoint.resume=True
+
 
 #resume training
 MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" model=simple_baseline dataset=clevr run_type=train_val checkpoint.resume=True training.experiment_name=baseline_att
