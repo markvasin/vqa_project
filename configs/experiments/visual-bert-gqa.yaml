@@ -1,3 +1,5 @@
+project_name: gqa_project
+
 model_config:
   visual_bert:
     training_head_type: classification
@@ -36,7 +38,8 @@ evaluation:
   - vqa_accuracy
 
 training:
-  batch_size: 480
+  experiment_name: visual_bert_gqa
+  batch_size: 32
   lr_scheduler: true
   # Don't forget to update schedule_attributes if you update this
   max_updates: 88000
@@ -44,6 +47,8 @@ training:
   early_stop:
     criteria: gqa/vqa_accuracy
     minimize: false
+  tensorboard: true
+  wandb: true
 
 checkpoint:
   pretrained_state_mapping:
