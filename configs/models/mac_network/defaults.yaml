@@ -1,28 +1,23 @@
 model_config:
   mac_network:
-    freeze_visual: true
-    dimension: 512
+    dimension: 2048
     losses:
     - type: logit_bce
     text_embedding:
       embedding_dim: 300
     lstm:
       input_size: 300
-      hidden_size: 512
+      hidden_size: 2048
       bidirectional: true
       batch_first: true
     mac_unit:
       max_step: 4
       self_attention: False
       memory_gate: False
-      dim: 512
-    image_encoder:
-      type: resnet101
-      params:
-        pretrained: true
+      dim: 2048
     classifier:
       type: mlp
       params:
-        in_dim: 1536
+        in_dim: 6144
         out_dim: 2
         num_layers: 1

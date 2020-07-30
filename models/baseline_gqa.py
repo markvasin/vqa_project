@@ -49,7 +49,7 @@ class SimpleBaseline(BaseModel):
 
         text_processor = registry.get(self._datasets[0] + "_text_processor")
         vocab = text_processor.vocab
-        self.word_embedding = vocab.get_embedding(torch.nn.Embedding,
+        self.word_embedding = vocab.get_embedding(torch.nn.Embedding, freeze=True,
                                                   embedding_dim=self.config.text_embedding.embedding_dim)
 
         self.lstm = nn.LSTM(**self.config.lstm)
