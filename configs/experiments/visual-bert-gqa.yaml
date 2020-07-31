@@ -35,7 +35,7 @@ scheduler:
 
 evaluation:
   metrics:
-  - vqa_accuracy
+  - accuracy
 
 training:
   experiment_name: visual_bert_gqa
@@ -45,7 +45,7 @@ training:
   max_updates: 88000
   find_unused_parameters: true
   early_stop:
-    criteria: gqa/vqa_accuracy
+    criteria: gqa/accuracy
     minimize: false
   tensorboard: true
   wandb: true
