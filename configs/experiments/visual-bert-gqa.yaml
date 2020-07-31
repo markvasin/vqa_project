@@ -48,10 +48,13 @@ training:
     criteria: gqa/vqa_accuracy
     minimize: false
   tensorboard: true
-  wandb: true
+  wandb: false
 
 checkpoint:
   pretrained_state_mapping:
     model.bert: model.bert
   resume_pretrained: true
   resume_zoo: visual_bert.pretrained.coco.defaults
+
+env:
+  save_dir: ./save/${training.experiment_name}
