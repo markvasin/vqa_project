@@ -48,7 +48,7 @@ training:
     criteria: gqa/vqa_accuracy
     minimize: false
   tensorboard: true
-  wandb: false
+  wandb: true
 
 checkpoint:
   pretrained_state_mapping:
