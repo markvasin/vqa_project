@@ -43,6 +43,7 @@ training:
   lr_scheduler: true
   # Don't forget to update schedule_attributes if you update this
   max_updates: 88000
+  evaluation_interval: 3000
   find_unused_parameters: true
   early_stop:
     criteria: gqa/accuracy
