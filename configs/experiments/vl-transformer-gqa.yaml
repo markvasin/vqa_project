@@ -1,3 +1,5 @@
+project_name: gqa_project
+
 model_config:
   vl_transformer:
     training_head_type: classification
@@ -33,6 +35,7 @@ scheduler:
     num_training_steps: 88000
 env:
   user_dir: /home/mark/vqa_project
+  save_dir: ./save/${training.experiment_name}
 
 
 evaluation:
@@ -40,16 +43,16 @@ evaluation:
   - vqa_accuracy
 
 training:
-  batch_size: 480
+  batch_size: 128
   lr_scheduler: true
-   Don't forget to update schedule_attributes if you update this
+#   Don't forget to update schedule_attributes if you update this
   max_updates: 88000
   find_unused_parameters: true
   early_stop:
     criteria: gqa/vqa_accuracy
     minimize: false
-  tensorboard: false
-  wandb: false
+  tensorboard: true
+  wandb: true
 
 checkpoint:
   pretrained_state_mapping:
