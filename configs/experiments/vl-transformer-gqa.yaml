@@ -54,6 +54,6 @@ training:
   tensorboard: true
   wandb: true
 
-checkpoint:
-  pretrained_state_mapping:
-    bert: bert
+#checkpoint:
+#  pretrained_state_mapping:
+#    bert: bert
