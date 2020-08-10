@@ -40,17 +40,18 @@ env:
 
 evaluation:
   metrics:
-  - vqa_accuracy
+  - accuracy
 
 training:
-  batch_size: 128
+  batch_size: 64
   lr_scheduler: true
 #   Don't forget to update schedule_attributes if you update this
   max_updates: 88000
+  evaluation_interval: 3000
   find_unused_parameters: true
-  early_stop:
-    criteria: gqa/vqa_accuracy
-    minimize: false
+#  early_stop:
+#    criteria: gqa2/vqa_accuracy
+#    minimize: false
   tensorboard: true
   wandb: true
 
