@@ -1,8 +1,8 @@
-import os
-
 import h5py
 import json
+import os
 import torch
+
 from mmf.common.sample import Sample
 from mmf.datasets.mmf_dataset import MMFDataset
 from mmf.utils.configuration import get_mmf_env
@@ -55,7 +55,6 @@ class GQADatasetV2(MMFDataset):
         if self._use_features is True:
             idx = int(self.img_info[str(sample_info["image_id"])]['index'])
             current_sample.img_feature = torch.from_numpy(self.img[idx])
-
 
         # Depending on whether we are using soft copy this can add
         # dynamic answer space

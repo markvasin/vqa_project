@@ -18,7 +18,7 @@ class ResNet101ImageEncoder(nn.Module):
 
 
 class ImageBertEncoder(nn.Module):
-    def __init__(self, config, *args, **kwargs):
+    def __init__(self, config):
         super().__init__()
         self.config = config
         self.projection = nn.Conv2d(config.image_hidden_size, config.hidden_size, 1)
