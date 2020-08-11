@@ -3,7 +3,7 @@ project_name: gqa_project
 model_config:
   vqa_transformer:
     training_head_type: classification
-    num_labels: 1534
+    num_labels: 1844
     losses:
     - type: logit_bce
 

@@ -78,9 +78,16 @@ class VqaTransformer(BaseModel):
         embeddings = self.LayerNorm(embeddings)
         embeddings = self.dropout(embeddings)
 
-        mask = None
+        # attention mask
+        cls_mask = torch.ones(cls_token.size()[:-1], device=device, dtype=torch.long)
+        text_mask = sample_list.text_mask
+        img_mask = torch.ones(img_tokens.size()[:-1], device=device, dtype=torch.long)
+        attention_mask = torch.cat([cls_mask, text_mask, img_mask], dim=1)
+        extended_attention_mask = attention_mask.unsqueeze(1).unsqueeze(2)
+        extended_attention_mask = extended_attention_mask.to(dtype=next(self.parameters()).dtype)
+        extended_attention_mask = (1.0 - extended_attention_mask) * -10000.0
 
-        transformer_outputs = self.transformer(embeddings, mask, head_mask=self.head_mask)
+        transformer_outputs = self.transformer(embeddings, extended_attention_mask, head_mask=self.head_mask)
         sequence_output = transformer_outputs[0]
         pooled_output = self.pooler(sequence_output)
         pooled_output = self.dropout(pooled_output)
