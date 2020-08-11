@@ -6,7 +6,7 @@ from transformers.modeling_bert import BertEncoder, BertPooler, BertPredictionHe
 
 from mmf.common.registry import registry
 from mmf.models.base_model import BaseModel
-from models.image_encoder import ImageBertEncoder
+from .image_encoder import ImageBertEncoder
 
 
 @registry.register_model("vqa_transformer")
@@ -30,6 +30,7 @@ class VqaTransformer(BaseModel):
 
         self.cls_project = nn.Linear(self.config.text_embedding.embedding_dim, self.config.hidden_size)
         self.lstm = nn.LSTM(**self.config.lstm)
+        self.lstm_proj = nn.Linear(self.config.hidden_size * 2, self.config.hidden_size)
         self.img_encoder = ImageBertEncoder(self.config)
 
         self.LayerNorm = nn.LayerNorm(self.config.hidden_size, eps=self.config.layer_norm_eps)
@@ -59,18 +60,19 @@ class VqaTransformer(BaseModel):
         cls_token_id = torch.tensor(self.vocab.vocab.stoi['[CLS]'], device=device).repeat(batch_size, 1)
         cls_token_embeds = self.word_embedding(cls_token_id)
         cls_token = self.cls_project(cls_token_embeds)
-        cls_type_ids = torch.zeros((cls_token.size(0), cls_token.size(1)), dtype=torch.long, device=device)
+        cls_type_ids = torch.zeros(cls_token.size()[:-1], dtype=torch.long, device=device)
         cls_type_embedding = self.segment_embeddings(cls_type_ids)
         cls_embeddings = cls_token + cls_type_embedding
 
         text_feat = self.word_embedding(question)
         text_tokens, _ = self.lstm(text_feat)
-        text_type_ids = torch.zeros((text_tokens.size(0), text_tokens.size(1)), dtype=torch.long, device=device)
+        text_tokens = self.lstm_proj(text_tokens)
+        text_type_ids = torch.zeros(text_tokens.size()[:-1], dtype=torch.long, device=device)
         text_type_embedding = self.segment_embeddings(text_type_ids)
         text_embeddings = text_tokens + text_type_embedding
 
         img_tokens = self.img_encoder(image_features)
-        img_type_ids = torch.ones((img_tokens.size(0), img_tokens.size(1)), dtype=torch.long, device=device)
+        img_type_ids = torch.ones(img_tokens.size()[:-1], dtype=torch.long, device=device)
         img_type_embedding = self.segment_embeddings(img_type_ids)
         img_embeddings = img_tokens + img_type_embedding
 
@@ -98,9 +100,3 @@ class VqaTransformer(BaseModel):
 
         return output
 
-
-def make_mask(feature):
-    return (torch.sum(
-        torch.abs(feature),
-        dim=-1
-    ) == 0).unsqueeze(1).unsqueeze(2)
