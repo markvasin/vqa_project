@@ -25,10 +25,10 @@ def gqa_feature_loader():
 class GQADatasetV2(MMFDataset):
     def __init__(self, config, dataset_type, imdb_file_index, *args, **kwargs):
         super().__init__("gqa2", config, dataset_type, imdb_file_index, *args, **kwargs)
-        self.img, self.img_info = gqa_feature_loader()
+        # self.img, self.img_info = gqa_feature_loader()
 
-    def build_features_db(self):
-        pass
+    # def build_features_db(self):
+    #     pass
 
     def __getitem__(self, idx):
         sample_info = self.annotation_db[idx]
@@ -54,8 +54,12 @@ class GQADatasetV2(MMFDataset):
             current_sample.image_id = sample_info["image_id"]
 
         if self._use_features is True:
-            idx = int(self.img_info[str(sample_info["image_id"])]['index'])
-            current_sample.img_feature = torch.from_numpy(self.img[idx])
+            features = self.features_db[idx]
+            if hasattr(self, "transformer_bbox_processor"):
+                features["image_info_0"] = self.transformer_bbox_processor(
+                    features["image_info_0"]
+                )
+            current_sample.update(features)
 
         # Depending on whether we are using soft copy this can add
         # dynamic answer space

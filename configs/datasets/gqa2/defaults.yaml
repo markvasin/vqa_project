@@ -42,7 +42,7 @@ dataset_config:
           preprocessor:
             type: simple_word
             params: {}
-    return_features_info: false
+    return_features_info: true
     # Return OCR information
     use_ocr: false
     # Return spatial information of OCR tokens if present
