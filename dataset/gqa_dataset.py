@@ -1,8 +1,8 @@
-import os
-
 import h5py
 import json
+import os
 import torch
+
 from mmf.common.sample import Sample
 from mmf.datasets.mmf_dataset import MMFDataset
 from mmf.utils.configuration import get_mmf_env
@@ -37,6 +37,7 @@ class GQADatasetV2(MMFDataset):
         text_processor_argument = {"text": sample_info["question_str"]}
         processed_question = self.text_processor(text_processor_argument)
         current_sample.text = processed_question["text"]
+        current_sample.text_mask = processed_question["text_mask"]
         current_sample.raw_question = sample_info["question_str"]
         if "input_ids" in processed_question:
             current_sample.update(processed_question)
@@ -55,7 +56,6 @@ class GQADatasetV2(MMFDataset):
         if self._use_features is True:
             idx = int(self.img_info[str(sample_info["image_id"])]['index'])
             current_sample.img_feature = torch.from_numpy(self.img[idx])
-
 
         # Depending on whether we are using soft copy this can add
         # dynamic answer space

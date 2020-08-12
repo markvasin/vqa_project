@@ -26,11 +26,11 @@ dataset_config:
       text_processor:
         type: vocab
         params:
-          max_length: 14
+          max_length: 20
           vocab:
             type: intersected
             embedding_name: glove.6B.300d
-            vocab_file: gqa/defaults/vocabs/vocabulary_100k.txt
+            vocab_file: gqa/defaults/vocabs/gqa_vocab.txt
           preprocessor:
             type: simple_sentence
             params: {}
@@ -38,7 +38,7 @@ dataset_config:
         type: vqa_answer
         params:
           num_answers: 10
-          vocab_file: gqa/defaults/vocabs/answers_gqa.txt
+          vocab_file: gqa/defaults/vocabs/gqa_answers.txt
           preprocessor:
             type: simple_word
             params: {}
