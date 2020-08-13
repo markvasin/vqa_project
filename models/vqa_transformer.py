@@ -59,10 +59,7 @@ class VqaTransformer(BaseModel):
 
         cls_token_id = torch.tensor(self.vocab.vocab.stoi['[CLS]'], device=device).repeat(batch_size, 1)
         cls_token_embeds = self.word_embedding(cls_token_id)
-        cls_token = self.cls_project(cls_token_embeds)
-        cls_type_ids = torch.zeros(cls_token.size()[:-1], dtype=torch.long, device=device)
-        cls_type_embedding = self.segment_embeddings(cls_type_ids)
-        cls_embeddings = cls_token + cls_type_embedding
+        cls_embeddings = self.cls_project(cls_token_embeds)
 
         text_feat = self.word_embedding(question)
         text_tokens, _ = self.lstm(text_feat)
