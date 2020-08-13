@@ -6,7 +6,7 @@ from transformers.modeling_bert import BertEncoder, BertPooler, BertPredictionHe
 
 from mmf.common.registry import registry
 from mmf.models.base_model import BaseModel
-from .image_encoder import ImageBertEncoder
+from .image_encoder import ImageBertEncoder, ImageClevrEncoder
 
 
 @registry.register_model("vqa_transformer")
@@ -31,7 +31,7 @@ class VqaTransformer(BaseModel):
         self.cls_project = nn.Linear(self.config.text_embedding.embedding_dim, self.config.hidden_size)
         self.lstm = nn.LSTM(**self.config.lstm)
         self.lstm_proj = nn.Linear(self.config.hidden_size * 2, self.config.hidden_size)
-        self.img_encoder = ImageBertEncoder(self.config)
+        self.img_encoder = ImageClevrEncoder(self.config)
 
         self.LayerNorm = nn.LayerNorm(self.config.hidden_size, eps=self.config.layer_norm_eps)
         self.dropout = nn.Dropout(self.config.hidden_dropout_prob)
@@ -55,7 +55,7 @@ class VqaTransformer(BaseModel):
         device = sample_list.text.device
 
         question = sample_list.text
-        image_features = sample_list.img_feature
+        image = sample_list.image
 
         cls_token_id = torch.tensor(self.vocab.vocab.stoi['[CLS]'], device=device).repeat(batch_size, 1)
         cls_token_embeds = self.word_embedding(cls_token_id)
@@ -68,7 +68,7 @@ class VqaTransformer(BaseModel):
         text_type_embedding = self.segment_embeddings(text_type_ids)
         text_embeddings = text_tokens + text_type_embedding
 
-        img_tokens = self.img_encoder(image_features)
+        img_tokens = self.img_encoder(image)
         img_type_ids = torch.ones(img_tokens.size()[:-1], dtype=torch.long, device=device)
         img_type_embedding = self.segment_embeddings(img_type_ids)
         img_embeddings = img_tokens + img_type_embedding
@@ -78,7 +78,7 @@ class VqaTransformer(BaseModel):
         embeddings = self.dropout(embeddings)
 
         # attention mask
-        cls_mask = torch.ones(cls_token.size()[:-1], device=device, dtype=torch.long)
+        cls_mask = torch.ones(cls_embeddings.size()[:-1], device=device, dtype=torch.long)
         text_mask = sample_list.text_mask
         img_mask = torch.ones(img_tokens.size()[:-1], device=device, dtype=torch.long)
         attention_mask = torch.cat([cls_mask, text_mask, img_mask], dim=1)
@@ -96,4 +96,3 @@ class VqaTransformer(BaseModel):
         output["scores"] = reshaped_logits
 
         return output
-
