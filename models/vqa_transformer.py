@@ -6,7 +6,7 @@ from transformers.modeling_bert import BertEncoder, BertPooler, BertPredictionHe
 
 from mmf.common.registry import registry
 from mmf.models.base_model import BaseModel
-from .image_encoder import ImageBertEncoder, ImageClevrEncoder
+from .image_encoder import ImageBertEncoder, ImageClevrEncoder, ResNet101ImageEncoder
 
 
 @registry.register_model("vqa_transformer")
@@ -31,7 +31,7 @@ class VqaTransformer(BaseModel):
         self.cls_project = nn.Linear(self.config.text_embedding.embedding_dim, self.config.hidden_size)
         self.lstm = nn.LSTM(**self.config.lstm)
         self.lstm_proj = nn.Linear(self.config.hidden_size * 2, self.config.hidden_size)
-        self.img_encoder = ImageClevrEncoder(self.config)
+        self.img_encoder = ResNet101ImageEncoder(self.config)
 
         self.LayerNorm = nn.LayerNorm(self.config.hidden_size, eps=self.config.layer_norm_eps)
         self.dropout = nn.Dropout(self.config.hidden_dropout_prob)

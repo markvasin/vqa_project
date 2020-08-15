@@ -23,6 +23,11 @@ MMF_USER_DIR="." mmf_run config="configs/experiments/vl-transformer-gqa.yaml" mo
 #train vqa_transformer on GQA
 MMF_USER_DIR="." mmf_run config="configs/experiments/vqa-transformer-gqa.yaml" model=vqa_transformer dataset=gqa2 run_type=train_val training.experiment_name=vqa_transformer_gqa
 
+#train vqa_transformer on CLEVR
+MMF_USER_DIR="." mmf_run config="configs/experiments/vqa-transformer-clevr.yaml" model=vqa_transformer dataset=clevr run_type=train_val training.experiment_name=vqa_transformer_clevr
+
+
+
 #resume training
 MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" model=simple_baseline dataset=clevr run_type=train_val checkpoint.resume=True training.experiment_name=baseline_att
 

@@ -3,7 +3,7 @@ project_name: clevr_project
 optimizer:
   type: adam_w
   params:
-    lr: 2.5e-4
+    lr: 3e-4
     eps: 1e-8
 
 #scheduler:
@@ -21,7 +21,7 @@ evaluation:
   - accuracy
 
 training:
-  batch_size: 256
+  batch_size: 128
   lr_scheduler: false
 #   Don't forget to update schedule_attributes if you update this
   max_updates: 88000
@@ -47,10 +47,21 @@ dataset_config:
               params:
                 size: [224, 224]
             - ToTensor
-#            - type: Normalize
-#              params:
-#                mean: [0.485, 0.456, 0.406]
-#                std: [0.229, 0.224, 0.225]
+            - type: Normalize
+              params:
+                mean: [0.485, 0.456, 0.406]
+                std: [0.229, 0.224, 0.225]
+      text_processor:
+        type: vocab
+        params:
+          max_length: 30
+          vocab:
+            type: intersected
+            embedding_name: glove.6B.300d
+            vocab_file: vocabs/clevr_question_vocab.txt
+          preprocessor:
+            type: simple_sentence
+            params: {}
 
 model_config:
   vqa_transformer:
@@ -58,7 +69,7 @@ model_config:
     num_labels: 32
     losses:
       - type: logit_bce
-    image_hidden_size: 256
+    image_hidden_size: 1024
     num_segment_type: 2
     hidden_size: 256
     num_hidden_layers: 6
