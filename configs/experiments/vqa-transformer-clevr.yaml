@@ -26,6 +26,7 @@ training:
 #   Don't forget to update schedule_attributes if you update this
   max_updates: 88000
   evaluation_interval: 2000
+  checkpoint_interval: 1000
 #  early_stop:
 #    criteria: gqa2/vqa_accuracy
 #    minimize: false
@@ -36,39 +37,39 @@ training:
 #  pretrained_state_mapping:
 #    bert: bert
 
-dataset_config:
-  clevr:
-    processors:
-      image_processor:
-        type: torchvision_transforms
-        params:
-          transforms:
-            - type: Resize
-              params:
-                size: [224, 224]
-            - ToTensor
-            - type: Normalize
-              params:
-                mean: [0.485, 0.456, 0.406]
-                std: [0.229, 0.224, 0.225]
-      text_processor:
-        type: vocab
-        params:
-          max_length: 30
-          vocab:
-            type: intersected
-            embedding_name: glove.6B.300d
-            vocab_file: vocabs/clevr_question_vocab.txt
-          preprocessor:
-            type: simple_sentence
-            params: {}
+#dataset_config:
+#  clevr:
+#    processors:
+#      image_processor:
+#        type: torchvision_transforms
+#        params:
+#          transforms:
+#            - type: Resize
+#              params:
+#                size: [224, 224]
+#            - ToTensor
+#            - type: Normalize
+#              params:
+#                mean: [0.485, 0.456, 0.406]
+#                std: [0.229, 0.224, 0.225]
+#      text_processor:
+#        type: vocab
+#        params:
+#          max_length: 30
+#          vocab:
+#            type: intersected
+#            embedding_name: glove.6B.300d
+#            vocab_file: vocabs/clevr_question_vocab.txt
+#          preprocessor:
+#            type: simple_sentence
+#            params: {}
 
 model_config:
   vqa_transformer:
     training_head_type: classification
     num_labels: 32
     losses:
-      - type: logit_bce
+      - type: cross_entropy
     image_hidden_size: 1024
     num_segment_type: 2
     hidden_size: 256

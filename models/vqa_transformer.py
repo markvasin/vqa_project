@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from mmf.datasets.builders.clevr.dataset import CLEVRDataset
 from omegaconf import OmegaConf
 from transformers import BertConfig
 from transformers.modeling_bert import BertEncoder, BertPooler, BertPredictionHeadTransform
@@ -22,16 +23,28 @@ class VqaTransformer(BaseModel):
         return "configs/models/vqa_transformer/defaults.yaml"
 
     def build(self):
-        self.text_processor = registry.get(self._datasets[0] + "_text_processor")
-        self.vocab = self.text_processor.vocab
-        self.word_embedding = self.vocab.get_embedding(torch.nn.Embedding, freeze=False,
-                                                       embedding_dim=self.config.text_embedding.embedding_dim)
+        # clever_word_emb = registry.mapping['state']['clevr_word_embedding']
+        # self.vocab = self.text_processor.vocab
+        # self.word_embedding = self.vocab.get_embedding(torch.nn.Embedding, freeze=False,
+        #                                                embedding_dim=self.config.text_embedding.embedding_dim)
+
+        # self.vocab = registry.mapping['state']['clevr_token_to_index']
+        # registry.unregister('clevr_word_embedding')
+        # registry.unregister('clevr_token_to_index')
+        self.word_embedding = nn.Embedding(
+            num_embeddings=83,
+            embedding_dim=300
+        )
+
+        self.word_embedding.weight.data.copy_(torch.from_numpy(CLEVRDataset.pretrained_emb))
+
         self.segment_embeddings = nn.Embedding(self.config.num_segment_type, self.config.hidden_size)
 
         self.cls_project = nn.Linear(self.config.text_embedding.embedding_dim, self.config.hidden_size)
         self.lstm = nn.LSTM(**self.config.lstm)
         self.lstm_proj = nn.Linear(self.config.hidden_size * 2, self.config.hidden_size)
-        self.img_encoder = ResNet101ImageEncoder(self.config)
+        # self.img_encoder = ResNet101ImageEncoder(self.config)
+        self.img_proj = nn.Linear(self.config.image_hidden_size, self.config.hidden_size)
 
         self.LayerNorm = nn.LayerNorm(self.config.hidden_size, eps=self.config.layer_norm_eps)
         self.dropout = nn.Dropout(self.config.hidden_dropout_prob)
@@ -44,7 +57,7 @@ class VqaTransformer(BaseModel):
 
         self.classifier = nn.Sequential(
             BertPredictionHeadTransform(self.config),
-            nn.Linear(self.config.hidden_size, self.config.num_labels),
+            nn.Linear(self.config.hidden_size, 28),
         )
 
         self.head_mask = [None for _ in range(self.config.num_hidden_layers)]
@@ -55,9 +68,12 @@ class VqaTransformer(BaseModel):
         device = sample_list.text.device
 
         question = sample_list.text
+        # ques_mask = sample_list.text_mask
+        # lang_feat_mask = make_mask(question.unsqueeze(2))
+
         image = sample_list.image
 
-        cls_token_id = torch.tensor(self.vocab.vocab.stoi['[CLS]'], device=device).repeat(batch_size, 1)
+        cls_token_id = torch.tensor(CLEVRDataset.token_to_ix['CLS'], device=device).repeat(batch_size, 1)
         cls_token_embeds = self.word_embedding(cls_token_id)
         cls_embeddings = self.cls_project(cls_token_embeds)
 
@@ -68,7 +84,7 @@ class VqaTransformer(BaseModel):
         text_type_embedding = self.segment_embeddings(text_type_ids)
         text_embeddings = text_tokens + text_type_embedding
 
-        img_tokens = self.img_encoder(image)
+        img_tokens = self.img_proj(image)
         img_type_ids = torch.ones(img_tokens.size()[:-1], dtype=torch.long, device=device)
         img_type_embedding = self.segment_embeddings(img_type_ids)
         img_embeddings = img_tokens + img_type_embedding
@@ -92,7 +108,15 @@ class VqaTransformer(BaseModel):
         pooled_output = self.dropout(pooled_output)
 
         logits = self.classifier(pooled_output)
-        reshaped_logits = logits.contiguous().view(-1, self.config.num_labels)
+        reshaped_logits = logits.contiguous().view(-1, 28)
         output["scores"] = reshaped_logits
 
         return output
+
+
+def make_mask(feature):
+    return (torch.sum(
+        torch.abs(feature),
+        dim=-1
+    ) == 0).unsqueeze(1).unsqueeze(2)
+
