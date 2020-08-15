@@ -3,7 +3,7 @@ project_name: clevr_project
 optimizer:
   type: adam_w
   params:
-    lr: 3e-4
+    lr: 4e-5
     eps: 1e-8
 
 #scheduler:
@@ -21,7 +21,7 @@ evaluation:
   - accuracy
 
 training:
-  batch_size: 128
+  batch_size: 64
   lr_scheduler: false
 #   Don't forget to update schedule_attributes if you update this
   max_updates: 88000
@@ -72,7 +72,7 @@ model_config:
       - type: cross_entropy
     image_hidden_size: 1024
     num_segment_type: 2
-    hidden_size: 256
+    hidden_size: 512
     num_hidden_layers: 6
     num_attention_heads: 4
     intermediate_size: 1024
@@ -85,5 +85,5 @@ model_config:
     lstm:
       input_size: 300
       hidden_size: ${model_config.vqa_transformer.hidden_size}
-      bidirectional: true
+      bidirectional: false
       batch_first: true

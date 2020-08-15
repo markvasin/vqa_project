@@ -1,3 +1,5 @@
+from importlib import import_module
+
 import torch
 import torch.nn as nn
 from mmf.datasets.builders.clevr.dataset import CLEVRDataset
@@ -8,6 +10,7 @@ from transformers.modeling_bert import BertEncoder, BertPooler, BertPredictionHe
 from mmf.common.registry import registry
 from mmf.models.base_model import BaseModel
 from .image_encoder import ImageBertEncoder, ImageClevrEncoder, ResNet101ImageEncoder
+from .mca import MCA_ED, AttFlat, LayerNorm
 
 
 @registry.register_model("vqa_transformer")
@@ -38,29 +41,37 @@ class VqaTransformer(BaseModel):
 
         self.word_embedding.weight.data.copy_(torch.from_numpy(CLEVRDataset.pretrained_emb))
 
-        self.segment_embeddings = nn.Embedding(self.config.num_segment_type, self.config.hidden_size)
+        # self.segment_embeddings = nn.Embedding(self.config.num_segment_type, self.config.hidden_size)
 
-        self.cls_project = nn.Linear(self.config.text_embedding.embedding_dim, self.config.hidden_size)
+        # self.cls_project = nn.Linear(self.config.text_embedding.embedding_dim, self.config.hidden_size)
         self.lstm = nn.LSTM(**self.config.lstm)
-        self.lstm_proj = nn.Linear(self.config.hidden_size * 2, self.config.hidden_size)
+        # self.lstm_proj = nn.Linear(self.config.hidden_size * 2, self.config.hidden_size)
         # self.img_encoder = ResNet101ImageEncoder(self.config)
         self.img_proj = nn.Linear(self.config.image_hidden_size, self.config.hidden_size)
 
-        self.LayerNorm = nn.LayerNorm(self.config.hidden_size, eps=self.config.layer_norm_eps)
-        self.dropout = nn.Dropout(self.config.hidden_dropout_prob)
+        # self.LayerNorm = nn.LayerNorm(self.config.hidden_size, eps=self.config.layer_norm_eps)
+        # self.dropout = nn.Dropout(self.config.hidden_dropout_prob)
+        #
+        # self.bert_config = BertConfig.from_dict(
+        #     OmegaConf.to_container(self.config, resolve=True)
+        # )
+        # self.transformer = BertEncoder(self.bert_config)
+        # self.pooler = BertPooler(self.bert_config)
 
-        self.bert_config = BertConfig.from_dict(
-            OmegaConf.to_container(self.config, resolve=True)
-        )
-        self.transformer = BertEncoder(self.bert_config)
-        self.pooler = BertPooler(self.bert_config)
+        # self.classifier = nn.Sequential(
+        #     BertPredictionHeadTransform(self.config),
+        #     nn.Linear(self.config.hidden_size, 28),
+        # )
 
-        self.classifier = nn.Sequential(
-            BertPredictionHeadTransform(self.config),
-            nn.Linear(self.config.hidden_size, 28),
-        )
+        # self.head_mask = [None for _ in range(self.config.num_hidden_layers)]
 
-        self.head_mask = [None for _ in range(self.config.num_hidden_layers)]
+        self.backbone = MCA_ED(CfgLoader)
+        # Flatten to vector
+        self.attflat_img = AttFlat(CfgLoader)
+        self.attflat_lang = AttFlat(CfgLoader)
+
+        self.proj_norm = LayerNorm(CfgLoader.FLAT_OUT_SIZE)
+        self.proj = nn.Linear(CfgLoader.FLAT_OUT_SIZE, 28)
 
     def forward(self, sample_list):
         output = {}
@@ -73,43 +84,68 @@ class VqaTransformer(BaseModel):
 
         image = sample_list.image
 
-        cls_token_id = torch.tensor(CLEVRDataset.token_to_ix['CLS'], device=device).repeat(batch_size, 1)
-        cls_token_embeds = self.word_embedding(cls_token_id)
-        cls_embeddings = self.cls_project(cls_token_embeds)
+        # cls_token_id = torch.tensor(CLEVRDataset.token_to_ix['CLS'], device=device).repeat(batch_size, 1)
+        # cls_token_embeds = self.word_embedding(cls_token_id)
+        # cls_embeddings = self.cls_project(cls_token_embeds)
 
         text_feat = self.word_embedding(question)
         text_tokens, _ = self.lstm(text_feat)
-        text_tokens = self.lstm_proj(text_tokens)
-        text_type_ids = torch.zeros(text_tokens.size()[:-1], dtype=torch.long, device=device)
-        text_type_embedding = self.segment_embeddings(text_type_ids)
-        text_embeddings = text_tokens + text_type_embedding
+        # text_tokens = self.lstm_proj(text_tokens)
+        # text_type_ids = torch.zeros(text_tokens.size()[:-1], dtype=torch.long, device=device)
+        # text_type_embedding = self.segment_embeddings(text_type_ids)
+        # text_embeddings = text_tokens #+ text_type_embedding
 
         img_tokens = self.img_proj(image)
-        img_type_ids = torch.ones(img_tokens.size()[:-1], dtype=torch.long, device=device)
-        img_type_embedding = self.segment_embeddings(img_type_ids)
-        img_embeddings = img_tokens + img_type_embedding
+        # img_type_ids = torch.ones(img_tokens.size()[:-1], dtype=torch.long, device=device)
+        # img_type_embedding = self.segment_embeddings(img_type_ids)
+        # img_embeddings = img_tokens# + img_type_embedding
 
-        embeddings = torch.cat([cls_embeddings, text_embeddings, img_embeddings], 1)
-        embeddings = self.LayerNorm(embeddings)
-        embeddings = self.dropout(embeddings)
+        # embeddings = torch.cat([cls_embeddings, text_embeddings, img_embeddings], 1)
+        # embeddings = self.LayerNorm(embeddings)
+        # embeddings = self.dropout(embeddings)
 
         # attention mask
-        cls_mask = torch.ones(cls_embeddings.size()[:-1], device=device, dtype=torch.long)
-        text_mask = sample_list.text_mask
-        img_mask = torch.ones(img_tokens.size()[:-1], device=device, dtype=torch.long)
-        attention_mask = torch.cat([cls_mask, text_mask, img_mask], dim=1)
-        extended_attention_mask = attention_mask.unsqueeze(1).unsqueeze(2)
-        extended_attention_mask = extended_attention_mask.to(dtype=next(self.parameters()).dtype)
-        extended_attention_mask = (1.0 - extended_attention_mask) * -10000.0
+        # cls_mask = torch.ones(cls_embeddings.size()[:-1], device=device, dtype=torch.long)
+        # text_mask = sample_list.text_mask
+        # img_mask = torch.ones(img_tokens.size()[:-1], device=device, dtype=torch.long)
+        # attention_mask = torch.cat([cls_mask, text_mask, img_mask], dim=1)
+        # extended_attention_mask = attention_mask.unsqueeze(1).unsqueeze(2)
+        # extended_attention_mask = extended_attention_mask.to(dtype=next(self.parameters()).dtype)
+        # extended_attention_mask = (1.0 - extended_attention_mask) * -10000.0
 
-        transformer_outputs = self.transformer(embeddings, extended_attention_mask, head_mask=self.head_mask)
-        sequence_output = transformer_outputs[0]
-        pooled_output = self.pooler(sequence_output)
-        pooled_output = self.dropout(pooled_output)
+        # transformer_outputs = self.transformer(embeddings, extended_attention_mask, head_mask=self.head_mask)
+        # sequence_output = transformer_outputs[0]
+        # pooled_output = self.pooler(sequence_output)
+        # pooled_output = self.dropout(pooled_output)
 
-        logits = self.classifier(pooled_output)
-        reshaped_logits = logits.contiguous().view(-1, 28)
-        output["scores"] = reshaped_logits
+        lang_feat_mask = make_mask(question.unsqueeze(2))
+        img_feat_mask = make_mask(img_tokens)
+        lang_feat, img_feat = self.backbone(
+            text_tokens,
+            img_tokens,
+            lang_feat_mask,
+            img_feat_mask
+        )
+
+        # Flatten to vector
+        lang_feat = self.attflat_lang(
+            lang_feat,
+            lang_feat_mask
+        )
+
+        img_feat = self.attflat_img(
+            img_feat,
+            img_feat_mask
+        )
+        proj_feat = lang_feat + img_feat
+        proj_feat = self.proj_norm(proj_feat)
+        proj_feat = self.proj(proj_feat)
+
+        # logits = self.classifier(pooled_output)
+
+
+        # reshaped_logits = logits.contiguous().view(-1, 28)
+        output["scores"] = proj_feat
 
         return output
 
@@ -120,3 +156,14 @@ def make_mask(feature):
         dim=-1
     ) == 0).unsqueeze(1).unsqueeze(2)
 
+
+class CfgLoader:
+
+    LAYER = 6
+    HIDDEN_SIZE = 512
+    FF_SIZE = 2048
+    MULTI_HEAD = 8
+    DROPOUT_R = 0.1
+    FLAT_MLP_SIZE = 512
+    FLAT_GLIMPSES = 1
+    FLAT_OUT_SIZE = 1024
