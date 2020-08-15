@@ -1,0 +1,45 @@
+project_name: gqa_project
+
+model_config:
+  vqa_transformer:
+    training_head_type: classification
+    num_labels: 1844
+    losses:
+    - type: logit_bce
+
+optimizer:
+  type: adam_w
+  params:
+    lr: 5e-5
+    eps: 1e-8
+
+scheduler:
+  type: warmup_linear
+  params:
+    num_warmup_steps: 2000
+    num_training_steps: 88000
+env:
+  user_dir: /home/mark/vqa_project
+  save_dir: ./save/${training.experiment_name}
+
+
+evaluation:
+  metrics:
+  - accuracy
+
+training:
+  batch_size: 128
+  lr_scheduler: true
+#   Don't forget to update schedule_attributes if you update this
+  max_updates: 88000
+  evaluation_interval: 3000
+  find_unused_parameters: true
+#  early_stop:
+#    criteria: gqa2/vqa_accuracy
+#    minimize: false
+  tensorboard: true
+  wandb: true
+
+#checkpoint:
+#  pretrained_state_mapping:
+#    bert: bert
