@@ -20,6 +20,9 @@ MMF_USER_DIR="." mmf_run config="configs/experiments/mac-gqa.yaml" model=mac_net
 #train vl_transformer on GQA
 MMF_USER_DIR="." mmf_run config="configs/experiments/vl-transformer-gqa.yaml" model=vl_transformer dataset=gqa2 run_type=train_val training.experiment_name=vl_transformer_gqa
 
+#train vl_transformer on CLEVR
+MMF_USER_DIR="." mmf_run config="configs/experiments/vl-transformer-clevr.yaml" model=vl_transformer dataset=clevr run_type=train_val training.experiment_name=vl_transformer_clevr
+
 
 #resume training
 MMF_USER_DIR="." mmf_run config="configs/experiments/defaults.yaml" model=simple_baseline dataset=clevr run_type=train_val checkpoint.resume=True training.experiment_name=baseline_att

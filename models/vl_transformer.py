@@ -43,7 +43,7 @@ class MultimodalBertEncoder(nn.Module):
         self.pooler = bert.pooler
 
         self.img_embeddings = ImageBertEmbeddings(config, self.txt_embeddings)
-        self.img_encoder = ImageBertEncoder(config)
+        self.img_encoder = nn.Linear(1024, config.hidden_size)
         self.head_mask = [None for _ in range(self.config.num_hidden_layers)]
 
     def forward(self, sample_list):
