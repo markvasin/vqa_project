@@ -31,7 +31,8 @@ class VqaTransformer(BaseModel):
         self.cls_project = nn.Linear(self.config.text_embedding.embedding_dim, self.config.hidden_size)
         self.lstm = nn.LSTM(**self.config.lstm)
         self.lstm_proj = nn.Linear(self.config.hidden_size * 2, self.config.hidden_size)
-        self.img_encoder = ResNet101ImageEncoder(self.config)
+        self.img_encoder = ImageClevrEncoder(self.config)
+        self.img_pos_emb = nn.Linear(2, self.config.hidden_size)
 
         self.LayerNorm = nn.LayerNorm(self.config.hidden_size, eps=self.config.layer_norm_eps)
         self.dropout = nn.Dropout(self.config.hidden_dropout_prob)
@@ -71,7 +72,17 @@ class VqaTransformer(BaseModel):
         img_tokens = self.img_encoder(image)
         img_type_ids = torch.ones(img_tokens.size()[:-1], dtype=torch.long, device=device)
         img_type_embedding = self.segment_embeddings(img_type_ids)
-        img_embeddings = img_tokens + img_type_embedding
+
+        # image position embeddign
+        width = 14
+        height = 14
+        x = torch.arange(width, dtype=torch.float, device=device)
+        y = torch.arange(height, dtype=torch.float, device=device)
+        img_pos = torch.stack(torch.meshgrid([x, y]), dim=-1).view(width * height, 2).unsqueeze(0).expand(batch_size,
+                                                                                                          width * height,
+                                                                                                          2)
+        img_pos_emb = self.img_pos_emb(img_pos)
+        img_embeddings = img_tokens + img_type_embedding + img_pos_emb
 
         embeddings = torch.cat([cls_embeddings, text_embeddings, img_embeddings], 1)
         embeddings = self.LayerNorm(embeddings)
