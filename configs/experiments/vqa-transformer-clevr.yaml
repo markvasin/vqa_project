@@ -1,0 +1,97 @@
+project_name: clevr_project
+
+optimizer:
+  type: adam_w
+  params:
+    lr: 3e-4
+    eps: 1e-8
+
+#scheduler:
+#  type: warmup_linear
+#  params:
+#    num_warmup_steps: 2000
+#    num_training_steps: 88000
+env:
+  user_dir: /home/mark/vqa_project
+  save_dir: ./save/${training.experiment_name}
+
+
+evaluation:
+  metrics:
+  - accuracy
+
+training:
+  batch_size: 32
+  lr_scheduler: false
+#   Don't forget to update schedule_attributes if you update this
+  max_updates: 88000
+  evaluation_interval: 2000
+#  early_stop:
+#    criteria: gqa2/vqa_accuracy
+#    minimize: false
+  tensorboard: true
+  wandb: true
+
+#checkpoint:
+#  pretrained_state_mapping:
+#    bert: bert
+
+dataset_config:
+  clevr:
+    processors:
+      image_processor:
+        type: torchvision_transforms
+        params:
+          transforms:
+            - type: Resize
+              params:
+                size: [224, 224]
+            - ToTensor
+#            - type: Normalize
+#              params:
+#                mean: [0.485, 0.456, 0.406]
+#                std: [0.229, 0.224, 0.225]
+      text_processor:
+        type: vocab
+        params:
+          max_length: 30
+          vocab:
+            type: intersected
+            embedding_name: glove.6B.300d
+            vocab_file: vocabs/clevr_question_vocab.txt
+          preprocessor:
+            type: simple_sentence
+            params: {}
+      answer_processor:
+        type: multi_hot_answer_from_vocab
+        params:
+          num_answers: 1
+          # Vocab file is relative to [data_dir]/[data_folder]
+          vocab_file: vocabs/clevr_answer_vocab.txt
+          preprocessor:
+            type: simple_word
+            params: {}
+
+model_config:
+  vqa_transformer:
+    training_head_type: classification
+    num_labels: 32
+    losses:
+      - type: logit_bce
+    image_hidden_size: 1024
+    num_segment_type: 2
+    hidden_size: 256
+    num_hidden_layers: 6
+    num_attention_heads: 4
+    intermediate_size: 1024
+    hidden_act: "gelu"
+    hidden_dropout_prob: 0.1
+    layer_norm_eps: 1e-12
+
+    text_embedding:
+      embedding_dim: 300
+    lstm:
+      input_size: 300
+      hidden_size: ${model_config.vqa_transformer.hidden_size}
+      bidirectional: true
+      batch_first: true
